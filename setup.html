@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Firebase Database</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 GRRN Database Setup</h1>
+        <p>Click the button below to add sample NGOs to your Firebase database.</p>
+        
+        <button onclick="setupDatabase()">Add NGOs to Firebase</button>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <h3>What will be added:</h3>
+        <ul>
+            <li>Red Cross</li>
+            <li>Food Bank</li>
+            <li>Health Aid</li>
+            <li>Community Kitchen</li>
+            <li>Save the Children</li>
+        </ul>
+    </div>
+
+    <script type="module">
+        import { database, ref, set } from './src/firebase.js';
+        
+        window.setupDatabase = async function() {
+            const statusDiv = document.getElementById('status');
+            const button = document.querySelector('button');
+            
+            try {
+                button.disabled = true;
+                button.textContent = 'Adding NGOs...';
+                
+                const ngosRef = ref(database, 'ngos');
+                const ngosData = {
+                    "Red Cross": true,
+                    "Food Bank": true,
+                    "Health Aid": true,
+                    "Community Kitchen": true,
+                    "Save the Children": true
+                };
+                
+                await set(ngosRef, ngosData);
+                
+                statusDiv.className = 'status success';
+                statusDiv.innerHTML = '✅ <strong>Success!</strong> NGOs have been added to your Firebase database.<br>You can now use the GRRN app to donate resources.';
+                statusDiv.style.display = 'block';
+                
+                console.log('✅ NGOs added successfully to Firebase!');
+                console.log('NGOs:', Object.keys(ngosData));
+                
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `❌ <strong>Error:</strong> ${error.message}<br>Please check your Firebase configuration.`;
+                statusDiv.style.display = 'block';
+                
+                console.error('❌ Error adding NGOs:', error);
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Add NGOs to Firebase';
+            }
+        };
+    </script>
+</body>
+</html>
